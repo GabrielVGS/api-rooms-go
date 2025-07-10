@@ -2,18 +2,21 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"time"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
-	_ "github.com/joho/godotenv/autoload"
+	"api-go/internal/models"
+
+	// Autoloads .env file
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-// Service represents a service that interacts with a database.
+// Service represents a service that interacts with a database using GORM.
 type Service interface {
 	// Health returns a map of health status information.
 	// The keys and values in the map are service-specific.
@@ -22,32 +25,63 @@ type Service interface {
 	// Close terminates the database connection.
 	// It returns an error if the connection cannot be closed.
 	Close() error
+
+	// GetDB returns the underlying GORM DB instance for other parts of the app to use.
+	GetDB() *gorm.DB
 }
 
+// service struct now holds a *gorm.DB instance.
 type service struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
 var (
-	database   = os.Getenv("BLUEPRINT_DB_DATABASE")
-	password   = os.Getenv("BLUEPRINT_DB_PASSWORD")
-	username   = os.Getenv("BLUEPRINT_DB_USERNAME")
-	port       = os.Getenv("BLUEPRINT_DB_PORT")
-	host       = os.Getenv("BLUEPRINT_DB_HOST")
-	schema     = os.Getenv("BLUEPRINT_DB_SCHEMA")
+	// Environment variables for database connection
+	database = os.Getenv("BLUEPRINT_DB_DATABASE")
+	password = os.Getenv("BLUEPRINT_DB_PASSWORD")
+	username = os.Getenv("BLUEPRINT_DB_USERNAME")
+	port     = os.Getenv("BLUEPRINT_DB_PORT")
+	host     = os.Getenv("BLUEPRINT_DB_HOST")
+	schema   = os.Getenv("BLUEPRINT_DB_SCHEMA")
+
+	// dbInstance holds the singleton service instance.
 	dbInstance *service
 )
 
+// New initializes a new database service using GORM.
+// It uses a singleton pattern to ensure only one connection pool is created.
 func New() Service {
-	// Reuse Connection
+	// Reuse Connection if it already exists
 	if dbInstance != nil {
 		return dbInstance
 	}
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable&search_path=%s", username, password, host, port, database, schema)
-	db, err := sql.Open("pgx", connStr)
+
+	// Construct the Data Source Name (DSN) for PostgreSQL.
+	// Note the different format required by the GORM driver.
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable search_path=%s",
+		host, username, password, database, port, schema)
+
+	// Open a new GORM database connection.
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info), // Configure logger
+	})
 	if err != nil {
-		log.Fatal(err)
+		// If connection fails, log the error and exit.
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
+
+	log.Println("Database connection established successfully.")
+
+	// AutoMigrate will create or update the tables for the given models.
+	// It will only add missing fields, and won't delete/change existing ones.
+	log.Println("Running database migrations...")
+	err = db.AutoMigrate(&models.User{}, &models.Room{}, &models.Reservation{})
+	if err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+	log.Println("Migrations completed.")
+
+	// Create the singleton instance.
 	dbInstance = &service{
 		db: db,
 	}
@@ -62,21 +96,31 @@ func (s *service) Health() map[string]string {
 
 	stats := make(map[string]string)
 
-	// Ping the database
-	err := s.db.PingContext(ctx)
+	// Get the underlying *sql.DB instance from GORM to perform low-level checks.
+	sqlDB, err := s.db.DB()
 	if err != nil {
 		stats["status"] = "down"
-		stats["error"] = fmt.Sprintf("db down: %v", err)
-		log.Fatalf("db down: %v", err) // Log the error and terminate the program
+		stats["error"] = fmt.Sprintf("failed to get underlying sql.DB: %v", err)
+		log.Printf("Error getting sql.DB from GORM: %v", err)
 		return stats
 	}
 
-	// Database is up, add more statistics
+	// Ping the database to check for connectivity.
+	err = sqlDB.PingContext(ctx)
+	if err != nil {
+		stats["status"] = "down"
+		stats["error"] = fmt.Sprintf("db down: %v", err)
+		// Using log.Printf instead of Fatalf to avoid exiting during a health check.
+		log.Printf("db down: %v", err)
+		return stats
+	}
+
+	// Database is up, let's gather more statistics.
 	stats["status"] = "up"
 	stats["message"] = "It's healthy"
 
-	// Get database stats (like open connections, in use, idle, etc.)
-	dbStats := s.db.Stats()
+	// Get database connection pool stats.
+	dbStats := sqlDB.Stats()
 	stats["open_connections"] = strconv.Itoa(dbStats.OpenConnections)
 	stats["in_use"] = strconv.Itoa(dbStats.InUse)
 	stats["idle"] = strconv.Itoa(dbStats.Idle)
@@ -85,31 +129,36 @@ func (s *service) Health() map[string]string {
 	stats["max_idle_closed"] = strconv.FormatInt(dbStats.MaxIdleClosed, 10)
 	stats["max_lifetime_closed"] = strconv.FormatInt(dbStats.MaxLifetimeClosed, 10)
 
-	// Evaluate stats to provide a health message
-	if dbStats.OpenConnections > 40 { // Assuming 50 is the max for this example
+	// Evaluate stats to provide a more descriptive health message.
+	if dbStats.OpenConnections > 40 { // Example threshold
 		stats["message"] = "The database is experiencing heavy load."
 	}
-
 	if dbStats.WaitCount > 1000 {
 		stats["message"] = "The database has a high number of wait events, indicating potential bottlenecks."
 	}
-
 	if dbStats.MaxIdleClosed > int64(dbStats.OpenConnections)/2 {
-		stats["message"] = "Many idle connections are being closed, consider revising the connection pool settings."
+		stats["message"] = "Many idle connections are being closed, consider revising connection pool settings."
 	}
-
 	if dbStats.MaxLifetimeClosed > int64(dbStats.OpenConnections)/2 {
-		stats["message"] = "Many connections are being closed due to max lifetime, consider increasing max lifetime or revising the connection usage pattern."
+		stats["message"] = "Many connections are being closed due to max lifetime, consider revising usage patterns."
 	}
 
 	return stats
 }
 
 // Close closes the database connection.
-// It logs a message indicating the disconnection from the specific database.
-// If the connection is successfully closed, it returns nil.
-// If an error occurs while closing the connection, it returns the error.
 func (s *service) Close() error {
-	log.Printf("Disconnected from database: %s", database)
-	return s.db.Close()
+	log.Printf("Disconnecting from database: %s", database)
+	// Get the underlying sql.DB instance to close the connection pool.
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		log.Printf("Error getting sql.DB from GORM for closing: %v", err)
+		return err
+	}
+	return sqlDB.Close()
+}
+
+// GetDB provides access to the GORM DB instance for other packages to use.
+func (s *service) GetDB() *gorm.DB {
+	return s.db
 }
