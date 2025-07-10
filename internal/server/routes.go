@@ -25,27 +25,26 @@ func (s *Server) RegisterRoutes() http.Handler {
 		MaxAge:           300,
 	}))
 
-	// --- Rotas Públicas ---
+	// Rota de healthcheck
 
 	r.Get("/health", s.healthHandler)
 
-	// --- Conectando o UserHandler ---
+	// Criação do repositórios
 
-	// 1. Inicialize o Repositório
-	// Pegamos a conexão GORM (*gorm.DB) do nosso serviço de banco de dados.
 	userRepo := repository.NewUserRepository(s.db.GetDB())
+	// TODO: Criar os repositórios de Rooms e Reservations
 
-	// 2. Inicialize o Handler
-	// Injetamos o repositório que acabamos de criar no handler.
-	// Note que usamos um ponteiro para o repositório, como corrigimos antes.
+	// Criação dos Handlers
 	userHandler := handlers.UserHandler{
 		UserRepository: userRepo,
 	}
 
-	// 3. Registre as Rotas do Usuário
-	// É uma boa prática agrupar as rotas da API sob um prefixo como "/api".
+	// TODO: Criar os Handlers de Rooms e Reservations
+
+	// Registro das rotas
+	// Rotas terão o prefixo /api | EX /api/users, /api/rooms, /api/reservations
 	r.Route("/api", func(r chi.Router) {
-		userHandler.RegisterUserRoutes(r) // Isso criará as rotas /api/users/...
+		userHandler.RegisterUserRoutes(r)
 	})
 
 	return r

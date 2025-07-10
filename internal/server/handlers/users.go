@@ -42,15 +42,12 @@ func (uh *UserHandler) CreateUserHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// 1. Chame o método Create, que agora retorna o usuário criado
 	user, err := uh.UserRepository.Create(req.Email, req.Name, req.Password)
 	if err != nil {
-		// Verifica se o erro é de usuário duplicado
 		if err.Error() == fmt.Sprintf("usuário com email %s já existe", req.Email) {
 			utils.RespondWithError(w, http.StatusConflict, "Usuário já existe")
 			return
 		}
-		// Para outros erros, retorna um erro genérico de servidor
 		utils.RespondWithError(w, http.StatusInternalServerError, "Falha ao criar usuário")
 		return
 	}
