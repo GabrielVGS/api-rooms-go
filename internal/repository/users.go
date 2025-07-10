@@ -21,7 +21,7 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 
 // MUDANÇA 2: O nome do método é mais simples e direto.
 // Já que estamos no UserRepository, "Create" é suficiente.
-func (r *UserRepository) Create(email string, name string, password string) error {
+func (r *UserRepository) Create(email string, name string, password string) (*models.User, error) {
 	// MUDANÇA 3: Não precisamos mais chamar GetDB(). Usamos r.DB diretamente.
 	// E removemos a verificação de nil, pois agora é responsabilidade de quem
 	// cria o UserRepository (o NewUserRepository) garantir que o DB não seja nulo.
@@ -30,15 +30,15 @@ func (r *UserRepository) Create(email string, name string, password string) erro
 	// Verifica se um usuário com o email já existe
 	if err := r.DB.Model(&models.User{}).Where("email = ?", email).
 		Count(&userCount).Error; err != nil {
-		return fmt.Errorf("falha ao verificar se o usuário existe: %w", err)
+		return nil, fmt.Errorf("falha ao verificar se o usuário existe: %w", err)
 	}
 	if userCount > 0 {
-		return fmt.Errorf("usuário com email %s já existe", email)
+		return nil, fmt.Errorf("usuário com email %s já existe", email)
 	}
 
 	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
-		return fmt.Errorf("falha ao gerar hash da senha: %w", err)
+		return nil, fmt.Errorf("falha ao gerar hash da senha: %w", err)
 	}
 
 	user := models.User{
@@ -48,9 +48,9 @@ func (r *UserRepository) Create(email string, name string, password string) erro
 	}
 
 	if err := r.DB.Create(&user).Error; err != nil {
-		return fmt.Errorf("falha ao criar usuário: %w", err)
+		return nil, fmt.Errorf("falha ao criar usuário: %w", err)
 	}
-	return nil
+	return &user, nil
 }
 
 func (r *UserRepository) GetByID(id uint) (*models.User, error) {

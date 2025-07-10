@@ -1,7 +1,10 @@
 package utils
 
 import (
+	"api-go/internal/server/dtos"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"regexp"
 
 	"golang.org/x/crypto/bcrypt"
@@ -28,4 +31,16 @@ func IsValidEmail(email string) bool {
 	const emailRegex = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	matched := regexp.MustCompile(emailRegex).MatchString(email)
 	return matched
+}
+
+func RespondWithError(w http.ResponseWriter, status int, message string) {
+	w.Header().Set("content-type", "application/json")
+	w.WriteHeader(status)
+
+	errorResponse := dtos.ErrorResponse{
+		Message: message,
+		Status:  status,
+	}
+
+	json.NewEncoder(w).Encode(errorResponse)
 }
