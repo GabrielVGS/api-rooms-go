@@ -2,7 +2,6 @@ package repository
 
 import (
 	"api-go/internal/models"
-	"api-go/internal/utils"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -29,15 +28,10 @@ func (r *UserRepository) Create(email string, name string, password string) (*mo
 		return nil, fmt.Errorf("usuário com email %s já existe", email)
 	}
 
-	hashedPassword, err := utils.HashPassword(password)
-	if err != nil {
-		return nil, fmt.Errorf("falha ao gerar hash da senha: %w", err)
-	}
-
 	user := models.User{
 		Name:     name,
 		Email:    email,
-		Password: hashedPassword,
+		Password: password,
 	}
 
 	if err := r.DB.Create(&user).Error; err != nil {
