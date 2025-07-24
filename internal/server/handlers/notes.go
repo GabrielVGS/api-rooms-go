@@ -3,6 +3,7 @@ package handlers
 import (
 	"api-go/internal/repository"
 	"api-go/internal/server/dtos"
+	"api-go/internal/server/middlewares"
 	"api-go/internal/utils"
 	"encoding/json"
 	"net/http"
@@ -42,7 +43,14 @@ func (nh *NotesHandler) RegisterNotesRoutes(r chi.Router) {
 //	@Security		BearerAuth
 //	@Router			/notes [post]
 func (nh *NotesHandler) CreateNoteHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
+	}
+
+	userID := claims.UserID
 
 	var req dtos.CreateNoteRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -97,7 +105,13 @@ func (nh *NotesHandler) CreateNoteHandler(w http.ResponseWriter, r *http.Request
 //	@Security		BearerAuth
 //	@Router			/notes/{note_id} [get]
 func (nh *NotesHandler) GetNoteByIDHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
+	}
+
+	userID := claims.UserID
 	noteIDStr := chi.URLParam(r, "note_id")
 	noteID, err := strconv.ParseUint(noteIDStr, 10, 32)
 	if err != nil {

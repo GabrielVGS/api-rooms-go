@@ -3,6 +3,7 @@ package handlers
 import (
 	"api-go/internal/repository"
 	"api-go/internal/server/dtos"
+	"api-go/internal/server/middlewares"
 	"api-go/internal/utils"
 	"encoding/json"
 	"net/http"
@@ -42,8 +43,13 @@ func (rh *RoomsHandler) RegisterRoomsRoutes(r chi.Router) {
 //	@Security		BearerAuth
 //	@Router			/rooms [post]
 func (rh *RoomsHandler) CreateRoomsHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
+	}
 
+	userID := claims.UserID
 	var req dtos.CreateRoomRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, "Invalid request body")
