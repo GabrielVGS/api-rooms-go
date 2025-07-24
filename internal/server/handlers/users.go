@@ -29,6 +29,20 @@ func (uh *UserHandler) RegisterUserRoutes(r chi.Router) {
 	})
 }
 
+// CreateUserHandler creates a new user
+//
+//	@Summary		Create user
+//	@Description	Create a new user account
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dtos.CreateUserRequest	true	"User creation details"
+//	@Success		201		{object}	dtos.UserResponse
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		409		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/users [post]
 func (uh *UserHandler) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	var req dtos.CreateUserRequest
 
@@ -65,6 +79,20 @@ func (uh *UserHandler) CreateUserHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// GetUserByEmailHandler gets user by email
+//
+//	@Summary		Get user by email
+//	@Description	Retrieve user information by email address
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			email	query		string	true	"User email address"
+//	@Success		200		{object}	dtos.UserResponse
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		404		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/users/by-email [get]
 func (uh *UserHandler) GetUserByEmailHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 	if email == "" {
@@ -96,6 +124,20 @@ func (uh *UserHandler) GetUserByEmailHandler(w http.ResponseWriter, r *http.Requ
 	}
 }
 
+// GetUserByIDHandler gets user by ID
+//
+//	@Summary		Get user by ID
+//	@Description	Retrieve user information by user ID
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user_id	query		int	true	"User ID"
+//	@Success		200		{object}	dtos.UserResponse
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		404		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/users [get]
 func (uh *UserHandler) GetUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	ID := r.URL.Query().Get("user_id")
 
@@ -136,6 +178,22 @@ func (uh *UserHandler) GetUserByIDHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// UpdateUserHandler updates user information
+//
+//	@Summary		Update user
+//	@Description	Update user information by user ID
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user_id	path		int						true	"User ID"
+//	@Param			request	body		dtos.UpdateUserRequest	true	"User update details"
+//	@Success		200		{object}	dtos.UserResponse
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		404		{object}	dtos.ErrorResponse
+//	@Failure		409		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/users/{user_id} [put]
 func (uh *UserHandler) UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	var req dtos.UpdateUserRequest
 
@@ -220,6 +278,20 @@ func (uh *UserHandler) UpdateUserHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// DeleteUserHandler deletes a user
+//
+//	@Summary		Delete user
+//	@Description	Delete user by user ID
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user_id	path	int	true	"User ID"
+//	@Success		204		"No Content"
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		404		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/users/{user_id} [delete]
 func (uh *UserHandler) DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "user_id")
 	if userID == "" {

@@ -12,6 +12,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	httpSwagger "github.com/swaggo/http-swagger"
+	_ "api-go/docs" // Import generated docs
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -28,8 +30,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 	}))
 
 	// Rota de healthcheck
-
 	r.Get("/health", s.healthHandler)
+	
+	// Swagger documentation
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	// Criação do repositórios
 

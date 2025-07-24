@@ -27,6 +27,20 @@ func (nh *NotesHandler) RegisterNotesRoutes(r chi.Router) {
 	})
 }
 
+// CreateNoteHandler creates a new note
+//
+//	@Summary		Create note
+//	@Description	Create a new note in a room
+//	@Tags			notes
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dtos.CreateNoteRequest	true	"Note creation details"
+//	@Success		201		{object}	dtos.NoteResponse
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		403		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/notes [post]
 func (nh *NotesHandler) CreateNoteHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(uint)
 
@@ -67,6 +81,21 @@ func (nh *NotesHandler) CreateNoteHandler(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(response)
 }
 
+// GetNoteByIDHandler gets note by ID
+//
+//	@Summary		Get note by ID
+//	@Description	Retrieve detailed note information
+//	@Tags			notes
+//	@Accept			json
+//	@Produce		json
+//	@Param			note_id	path	int	true	"Note ID"
+//	@Success		200		{object}	dtos.NoteResponse
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		403		{object}	dtos.ErrorResponse
+//	@Failure		404		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/notes/{note_id} [get]
 func (nh *NotesHandler) GetNoteByIDHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(uint)
 	noteIDStr := chi.URLParam(r, "note_id")
@@ -108,6 +137,22 @@ func (nh *NotesHandler) GetNoteByIDHandler(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(response)
 }
 
+// UpdateNoteHandler updates a note
+//
+//	@Summary		Update note
+//	@Description	Update note information (only by note creator)
+//	@Tags			notes
+//	@Accept			json
+//	@Produce		json
+//	@Param			note_id	path	int						true	"Note ID"
+//	@Param			request	body	dtos.UpdateNoteRequest	true	"Note update details"
+//	@Success		200		{object}	map[string]string
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		403		{object}	dtos.ErrorResponse
+//	@Failure		404		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/notes/{note_id} [put]
 func (nh *NotesHandler) UpdateNoteHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(uint)
 	noteIDStr := chi.URLParam(r, "note_id")
@@ -152,6 +197,21 @@ func (nh *NotesHandler) UpdateNoteHandler(w http.ResponseWriter, r *http.Request
 	w.Write([]byte(`{"message": "Note updated successfully"}`))
 }
 
+// DeleteNoteHandler deletes a note
+//
+//	@Summary		Delete note
+//	@Description	Delete note (only by note creator)
+//	@Tags			notes
+//	@Accept			json
+//	@Produce		json
+//	@Param			note_id	path	int	true	"Note ID"
+//	@Success		200		{object}	map[string]string
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		403		{object}	dtos.ErrorResponse
+//	@Failure		404		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/notes/{note_id} [delete]
 func (nh *NotesHandler) DeleteNoteHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(uint)
 	noteIDStr := chi.URLParam(r, "note_id")
@@ -185,6 +245,20 @@ func (nh *NotesHandler) DeleteNoteHandler(w http.ResponseWriter, r *http.Request
 	w.Write([]byte(`{"message": "Note deleted successfully"}`))
 }
 
+// GetNotesByRoomHandler gets notes by room
+//
+//	@Summary		Get notes by room
+//	@Description	Get all notes in a specific room
+//	@Tags			notes
+//	@Accept			json
+//	@Produce		json
+//	@Param			room_id	path	int	true	"Room ID"
+//	@Success		200		{array}	dtos.NoteResponse
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		403		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/notes/room/{room_id} [get]
 func (nh *NotesHandler) GetNotesByRoomHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(uint)
 	roomIDStr := chi.URLParam(r, "room_id")
@@ -224,6 +298,17 @@ func (nh *NotesHandler) GetNotesByRoomHandler(w http.ResponseWriter, r *http.Req
 	json.NewEncoder(w).Encode(response)
 }
 
+// GetUserNotesHandler gets user's notes
+//
+//	@Summary		Get my notes
+//	@Description	Get all notes created by the current user
+//	@Tags			notes
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{array}	dtos.NoteResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/notes/my-notes [get]
 func (nh *NotesHandler) GetUserNotesHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(uint)
 

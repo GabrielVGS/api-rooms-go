@@ -30,6 +30,19 @@ func (ah *AuthHandler) RegisterAuthRoutes(r chi.Router) {
 	})
 }
 
+// LoginHandler authenticates user and returns JWT token
+//
+//	@Summary		User login
+//	@Description	Authenticate user with email and password
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dtos.AuthLoginRequest	true	"Login credentials"
+//	@Success		200		{object}	dtos.AuthLoginResponse
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		401		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Router			/auth/login [post]
 func (ah *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Handle user login
 	var loginRequest dtos.AuthLoginRequest
@@ -71,6 +84,19 @@ func (ah *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+// RegisterHandler creates new user account
+//
+//	@Summary		User registration
+//	@Description	Register new user account
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dtos.AuthRegisterRequest	true	"Registration details"
+//	@Success		201		{object}	dtos.AuthLoginResponse
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		409		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Router			/auth/register [post]
 func (ah *AuthHandler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// Handle user registration
 	var registerRequest dtos.AuthRegisterRequest
@@ -131,6 +157,18 @@ func (ah *AuthHandler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+// GetProfileHandler gets current user profile
+//
+//	@Summary		Get user profile
+//	@Description	Get current authenticated user profile
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	dtos.AuthProfileResponse
+//	@Failure		401	{object}	dtos.ErrorResponse
+//	@Failure		500	{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/auth/profile [get]
 func (ah *AuthHandler) GetProfileHandler(w http.ResponseWriter, r *http.Request) {
 	//
 	w.Header().Set("Content-Type", "application/json")

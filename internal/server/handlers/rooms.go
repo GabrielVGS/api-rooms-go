@@ -28,6 +28,19 @@ func (rh *RoomsHandler) RegisterRoomsRoutes(r chi.Router) {
 	})
 }
 
+// CreateRoomsHandler creates a new room
+//
+//	@Summary		Create room
+//	@Description	Create a new room and automatically join as creator
+//	@Tags			rooms
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dtos.CreateRoomRequest	true	"Room creation details"
+//	@Success		201		{object}	dtos.RoomResponse
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/rooms [post]
 func (rh *RoomsHandler) CreateRoomsHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(uint)
 
@@ -69,6 +82,17 @@ func (rh *RoomsHandler) CreateRoomsHandler(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(response)
 }
 
+// GetAllRoomsHandler gets all rooms
+//
+//	@Summary		Get all rooms
+//	@Description	Retrieve list of all available rooms
+//	@Tags			rooms
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{array}		dtos.RoomResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/rooms [get]
 func (rh *RoomsHandler) GetAllRoomsHandler(w http.ResponseWriter, r *http.Request) {
 	rooms, err := rh.RoomsRepository.GetAll()
 	if err != nil {
@@ -94,6 +118,20 @@ func (rh *RoomsHandler) GetAllRoomsHandler(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(response)
 }
 
+// GetRoomByIDHandler gets room by ID
+//
+//	@Summary		Get room by ID
+//	@Description	Retrieve detailed room information including members and notes
+//	@Tags			rooms
+//	@Accept			json
+//	@Produce		json
+//	@Param			room_id	path		int	true	"Room ID"
+//	@Success		200		{object}	dtos.RoomResponse
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		404		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/rooms/{room_id} [get]
 func (rh *RoomsHandler) GetRoomByIDHandler(w http.ResponseWriter, r *http.Request) {
 	roomIDStr := chi.URLParam(r, "room_id")
 	roomID, err := strconv.ParseUint(roomIDStr, 10, 32)
@@ -151,6 +189,22 @@ func (rh *RoomsHandler) GetRoomByIDHandler(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(response)
 }
 
+// UpdateRoomsHandler updates room information
+//
+//	@Summary		Update room
+//	@Description	Update room information (only by room creator)
+//	@Tags			rooms
+//	@Accept			json
+//	@Produce		json
+//	@Param			room_id	path		int					true	"Room ID"
+//	@Param			request	body		dtos.UpdateRoomRequest	true	"Room update details"
+//	@Success		200		{object}	map[string]string
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		403		{object}	dtos.ErrorResponse
+//	@Failure		404		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/rooms/{room_id} [put]
 func (rh *RoomsHandler) UpdateRoomsHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(uint)
 	roomIDStr := chi.URLParam(r, "room_id")
@@ -195,6 +249,21 @@ func (rh *RoomsHandler) UpdateRoomsHandler(w http.ResponseWriter, r *http.Reques
 	w.Write([]byte(`{"message": "Room updated successfully"}`))
 }
 
+// DeleteRoomsHandler deletes a room
+//
+//	@Summary		Delete room
+//	@Description	Delete room (only by room creator)
+//	@Tags			rooms
+//	@Accept			json
+//	@Produce		json
+//	@Param			room_id	path	int	true	"Room ID"
+//	@Success		200		{object}	map[string]string
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		403		{object}	dtos.ErrorResponse
+//	@Failure		404		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/rooms/{room_id} [delete]
 func (rh *RoomsHandler) DeleteRoomsHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(uint)
 	roomIDStr := chi.URLParam(r, "room_id")
@@ -228,6 +297,21 @@ func (rh *RoomsHandler) DeleteRoomsHandler(w http.ResponseWriter, r *http.Reques
 	w.Write([]byte(`{"message": "Room deleted successfully"}`))
 }
 
+// JoinRoomHandler joins a room
+//
+//	@Summary		Join room
+//	@Description	Join an existing room
+//	@Tags			rooms
+//	@Accept			json
+//	@Produce		json
+//	@Param			room_id	path	int	true	"Room ID"
+//	@Success		200		{object}	map[string]string
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		404		{object}	dtos.ErrorResponse
+//	@Failure		409		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/rooms/{room_id}/join [post]
 func (rh *RoomsHandler) JoinRoomHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(uint)
 	roomIDStr := chi.URLParam(r, "room_id")
@@ -261,6 +345,20 @@ func (rh *RoomsHandler) JoinRoomHandler(w http.ResponseWriter, r *http.Request) 
 	w.Write([]byte(`{"message": "Joined room successfully"}`))
 }
 
+// LeaveRoomHandler leaves a room
+//
+//	@Summary		Leave room
+//	@Description	Leave a room you're currently in
+//	@Tags			rooms
+//	@Accept			json
+//	@Produce		json
+//	@Param			room_id	path	int	true	"Room ID"
+//	@Success		200		{object}	map[string]string
+//	@Failure		400		{object}	dtos.ErrorResponse
+//	@Failure		404		{object}	dtos.ErrorResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/rooms/{room_id}/leave [delete]
 func (rh *RoomsHandler) LeaveRoomHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(uint)
 	roomIDStr := chi.URLParam(r, "room_id")
@@ -284,6 +382,17 @@ func (rh *RoomsHandler) LeaveRoomHandler(w http.ResponseWriter, r *http.Request)
 	w.Write([]byte(`{"message": "Left room successfully"}`))
 }
 
+// GetUserRoomsHandler gets user's rooms
+//
+//	@Summary		Get my rooms
+//	@Description	Get list of rooms the current user is a member of
+//	@Tags			rooms
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{array}		dtos.RoomResponse
+//	@Failure		500		{object}	dtos.ErrorResponse
+//	@Security		BearerAuth
+//	@Router			/rooms/my-rooms [get]
 func (rh *RoomsHandler) GetUserRoomsHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(uint)
 
