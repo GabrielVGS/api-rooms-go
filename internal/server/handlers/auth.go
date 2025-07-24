@@ -74,6 +74,11 @@ func (ah *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	response := dtos.AuthLoginResponse{
 		Token: token,
+		User: dtos.UserResponse{
+			ID:    user.ID,
+			Name:  user.Name,
+			Email: user.Email,
+		},
 	}
 
 	w.Header().Set("Content-Type", "application/json")
