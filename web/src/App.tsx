@@ -6,6 +6,7 @@ import { LoginForm } from './components/auth/LoginForm';
 import { RegisterForm } from './components/auth/RegisterForm';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { RoomList } from './components/rooms/RoomList';
+import { RoomDetails } from './components/rooms/RoomDetails';
 import { ReservationList } from './components/reservations/ReservationList';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="rooms" element={<RoomList />} />
+            <Route path="rooms/:id" element={<RoomDetails />} />
             <Route path="reservations" element={<ReservationList />} />
           </Route>
         </Routes>

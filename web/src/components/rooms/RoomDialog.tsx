@@ -56,6 +56,7 @@ export const RoomDialog: React.FC<RoomDialogProps> = ({
       if (room) {
         setValue('name', room.name);
         setValue('capacity', room.capacity);
+        setValue('subject', room.subject);
         setValue('description', room.description || '');
       } else {
         reset();
