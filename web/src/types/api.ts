@@ -8,15 +8,16 @@ export interface Room {
   id: number;
   name: string;
   capacity: number;
+  subject: string;
   description?: string;
 }
 
 export interface Reservation {
   id: number;
-  userId: number;
-  roomId: number;
-  startTime: string;
-  endTime: string;
+  user_id: number;
+  room_id: number;
+  start_time: string;
+  end_time: string;
   user?: User;
   room?: Room;
 }

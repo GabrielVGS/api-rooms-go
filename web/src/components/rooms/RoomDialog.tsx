@@ -18,6 +18,7 @@ import type { Room } from '@/types/api';
 const roomSchema = z.object({
   name: z.string().min(1, 'Room name is required'),
   capacity: z.number().min(1, 'Capacity must be at least 1'),
+  subject: z.string(),
   description: z.string().optional(),
 });
 
@@ -69,6 +70,7 @@ export const RoomDialog: React.FC<RoomDialogProps> = ({
 
     try {
       if (isEditing && room) {
+        console.log("talvez ?")
         await roomApi.updateRoom(room.id, data);
       } else {
         await roomApi.createRoom(data);
@@ -129,6 +131,20 @@ export const RoomDialog: React.FC<RoomDialogProps> = ({
               <p className="text-sm text-destructive">{errors.capacity.message}</p>
             )}
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="subject">Assunto</Label>
+            <Input
+              id="subject"
+              type="text"
+              min="1"
+              placeholder="Assunto"
+              {...register('subject', { valueAsNumber: false })}
+              className={errors.subject ? 'border-destructive' : ''}
+            />
+            {errors.subject && (
+              <p className="text-sm text-destructive">{errors.subject.message}</p>
+            )}
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="description">Description (Optional)</Label>
@@ -154,8 +170,8 @@ export const RoomDialog: React.FC<RoomDialogProps> = ({
                   ? 'Updating...'
                   : 'Creating...'
                 : isEditing
-                ? 'Update Room'
-                : 'Create Room'}
+                  ? 'Update Room'
+                  : 'Create Room'}
             </Button>
           </div>
         </form>

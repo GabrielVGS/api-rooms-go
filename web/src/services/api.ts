@@ -92,7 +92,7 @@ export const roomApi = {
       console.log('Fetching all rooms');
       const response = await api.get('/rooms');
       console.log(`Successfully fetched ${response.data.length} rooms`);
-      return response.data;
+      return response.data?? [];
     } catch (error) {
       console.error('Failed to fetch rooms:', error);
       throw error;
@@ -151,9 +151,9 @@ export const reservationApi = {
   createReservation: async (reservation: Omit<Reservation, 'id' | 'user' | 'room'>): Promise<Reservation> => {
     try {
       console.log('Creating new reservation:', {
-        roomId: reservation.roomId,
-        startTime: reservation.startTime,
-        endTime: reservation.endTime
+        roomId: reservation.room_id,
+        startTime: reservation.start_time,
+        endTime: reservation.end_time
       });
       const response = await api.post('/reservations', reservation);
       console.log('Successfully created reservation ID:', response.data.id);

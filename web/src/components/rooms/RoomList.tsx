@@ -14,6 +14,9 @@ import { roomApi } from '@/services/api';
 import type { Room } from '@/types/api';
 import { RoomDialog } from './RoomDialog';
 
+
+
+
 export const RoomList: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,11 +105,13 @@ export const RoomList: React.FC = () => {
               No rooms found. Create your first room to get started.
             </div>
           ) : (
+
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Capacity</TableHead>
+                  <TableHead>Assunto</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -116,6 +121,7 @@ export const RoomList: React.FC = () => {
                   <TableRow key={room.id}>
                     <TableCell className="font-medium">{room.name}</TableCell>
                     <TableCell>{room.capacity} people</TableCell>
+                    <TableCell>{room.subject}</TableCell>
                     <TableCell className="max-w-xs truncate">
                       {room.description || 'No description'}
                     </TableCell>

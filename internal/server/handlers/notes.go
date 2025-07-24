@@ -168,7 +168,13 @@ func (nh *NotesHandler) GetNoteByIDHandler(w http.ResponseWriter, r *http.Reques
 //	@Security		BearerAuth
 //	@Router			/notes/{note_id} [put]
 func (nh *NotesHandler) UpdateNoteHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
+	}
+
+	userID := claims.UserID
 	noteIDStr := chi.URLParam(r, "note_id")
 	noteID, err := strconv.ParseUint(noteIDStr, 10, 32)
 	if err != nil {
@@ -227,7 +233,13 @@ func (nh *NotesHandler) UpdateNoteHandler(w http.ResponseWriter, r *http.Request
 //	@Security		BearerAuth
 //	@Router			/notes/{note_id} [delete]
 func (nh *NotesHandler) DeleteNoteHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
+	}
+
+	userID := claims.UserID
 	noteIDStr := chi.URLParam(r, "note_id")
 	noteID, err := strconv.ParseUint(noteIDStr, 10, 32)
 	if err != nil {
@@ -274,7 +286,13 @@ func (nh *NotesHandler) DeleteNoteHandler(w http.ResponseWriter, r *http.Request
 //	@Security		BearerAuth
 //	@Router			/notes/room/{room_id} [get]
 func (nh *NotesHandler) GetNotesByRoomHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
+	}
+
+	userID := claims.UserID
 	roomIDStr := chi.URLParam(r, "room_id")
 	roomID, err := strconv.ParseUint(roomIDStr, 10, 32)
 	if err != nil {
@@ -324,7 +342,13 @@ func (nh *NotesHandler) GetNotesByRoomHandler(w http.ResponseWriter, r *http.Req
 //	@Security		BearerAuth
 //	@Router			/notes/my-notes [get]
 func (nh *NotesHandler) GetUserNotesHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
+	}
+
+	userID := claims.UserID
 
 	notes, err := nh.NotesRepository.GetByUserID(userID)
 	if err != nil {

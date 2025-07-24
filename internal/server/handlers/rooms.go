@@ -212,7 +212,13 @@ func (rh *RoomsHandler) GetRoomByIDHandler(w http.ResponseWriter, r *http.Reques
 //	@Security		BearerAuth
 //	@Router			/rooms/{room_id} [put]
 func (rh *RoomsHandler) UpdateRoomsHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
+	}
+
+	userID := claims.UserID
 	roomIDStr := chi.URLParam(r, "room_id")
 	roomID, err := strconv.ParseUint(roomIDStr, 10, 32)
 	if err != nil {
@@ -271,7 +277,13 @@ func (rh *RoomsHandler) UpdateRoomsHandler(w http.ResponseWriter, r *http.Reques
 //	@Security		BearerAuth
 //	@Router			/rooms/{room_id} [delete]
 func (rh *RoomsHandler) DeleteRoomsHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
+	}
+
+	userID := claims.UserID
 	roomIDStr := chi.URLParam(r, "room_id")
 	roomID, err := strconv.ParseUint(roomIDStr, 10, 32)
 	if err != nil {
@@ -319,7 +331,13 @@ func (rh *RoomsHandler) DeleteRoomsHandler(w http.ResponseWriter, r *http.Reques
 //	@Security		BearerAuth
 //	@Router			/rooms/{room_id}/join [post]
 func (rh *RoomsHandler) JoinRoomHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
+	}
+
+	userID := claims.UserID
 	roomIDStr := chi.URLParam(r, "room_id")
 	roomID, err := strconv.ParseUint(roomIDStr, 10, 32)
 	if err != nil {
@@ -366,7 +384,13 @@ func (rh *RoomsHandler) JoinRoomHandler(w http.ResponseWriter, r *http.Request) 
 //	@Security		BearerAuth
 //	@Router			/rooms/{room_id}/leave [delete]
 func (rh *RoomsHandler) LeaveRoomHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
+	}
+
+	userID := claims.UserID
 	roomIDStr := chi.URLParam(r, "room_id")
 	roomID, err := strconv.ParseUint(roomIDStr, 10, 32)
 	if err != nil {
@@ -400,7 +424,13 @@ func (rh *RoomsHandler) LeaveRoomHandler(w http.ResponseWriter, r *http.Request)
 //	@Security		BearerAuth
 //	@Router			/rooms/my-rooms [get]
 func (rh *RoomsHandler) GetUserRoomsHandler(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
+	}
+
+	userID := claims.UserID
 
 	rooms, err := rh.RoomsRepository.GetUserRooms(userID)
 	if err != nil {
