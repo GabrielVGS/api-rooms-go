@@ -1,24 +1,20 @@
-// Package main Room Reservation API
+// @title			API ROOMS
+// @version		1.0
+// @description	REST API para gerenciamento de salas
+
+// @contact.name	Gabriel Viana
+// @contact.email	gabriel.viana.rs@gmail.com
 //
-//	@title			Room Reservation API
-//	@version		1.0
-//	@description	REST API for room reservation management with user authentication
-//	@termsOfService	http://swagger.io/terms/
+// @license.name	MIT
+// @license.url	https://opensource.org/licenses/MIT
 //
-//	@contact.name	API Support
-//	@contact.url	http://www.swagger.io/support
-//	@contact.email	support@swagger.io
+// @host		localhost:8080
+// @BasePath	/api
 //
-//	@license.name	MIT
-//	@license.url	https://opensource.org/licenses/MIT
-//
-//	@host		localhost:8080
-//	@BasePath	/api
-//
-//	@securityDefinitions.apikey	BearerAuth
-//	@in							header
-//	@name						Authorization
-//	@description				Type "Bearer" followed by a space and JWT token.
+// @securityDefinitions.apikey	BearerAuth
+// @in							header
+// @name						Authorization
+// @description				Type "Bearer" followed by a space and JWT token.
 package main
 
 import (

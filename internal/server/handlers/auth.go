@@ -84,6 +84,7 @@ func (ah *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
 // RegisterHandler creates new user account
 //
 //	@Summary		User registration
@@ -157,6 +158,7 @@ func (ah *AuthHandler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
 // GetProfileHandler gets current user profile
 //
 //	@Summary		Get user profile
@@ -170,11 +172,38 @@ func (ah *AuthHandler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 //	@Security		BearerAuth
 //	@Router			/auth/profile [get]
 func (ah *AuthHandler) GetProfileHandler(w http.ResponseWriter, r *http.Request) {
-	//
-	w.Header().Set("Content-Type", "application/json")
-
-	if err := json.NewEncoder(w).Encode(map[string]string{"s": "o"}); err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+	// Get user claims from context
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "User not found in context")
+		return
 	}
 
+	// Get full user data from repository
+	user, err := ah.UserRepository.GetByID(claims.UserID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, "Could not fetch user profile")
+		return
+	}
+
+	if user == nil {
+		utils.RespondWithError(w, http.StatusNotFound, "User not found")
+		return
+	}
+
+	// Create response
+	response := dtos.AuthProfileResponse{
+		UserID:    user.ID,
+		Username:  user.Name,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		UpdatedAt: user.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, "Could not encode response")
+		return
+	}
 }
