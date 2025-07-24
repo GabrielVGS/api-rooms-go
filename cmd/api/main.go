@@ -67,6 +67,8 @@ func main() {
 	err := server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		panic(fmt.Sprintf("http server error: %s", err))
+	} else {
+		log.Println("SERVIDOR INICADO COM SUCESSO")
 	}
 
 	// Wait for the graceful shutdown to complete

@@ -1,69 +1,59 @@
-# React + TypeScript + Vite
+# Room Booking Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React frontend application for the room booking system built with:
 
-Currently, two official plugins are available:
+- **React 19** with TypeScript
+- **Vite** for build tooling
+- **shadcn/ui** component library
+- **Tailwind CSS** for styling
+- **React Router** for navigation
+- **React Hook Form** with Zod validation
+- **Axios** for API calls
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Quick Start
 
-## Expanding the ESLint configuration
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+3. Build for production:
+   ```bash
+   npm run build
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## Features
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Authentication**: Login and register with JWT tokens
+- **Room Management**: Create, edit, and delete meeting rooms
+- **Reservations**: Book rooms with date/time selection
+- **Dashboard**: Overview of rooms and upcoming reservations
+- **Responsive Design**: Works on desktop and mobile devices
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## API Integration
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The frontend expects the Go API to be running on `http://localhost:8080` with the following endpoints:
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- `POST /api/auth/login` - User login
+- `POST /api/auth/register` - User registration
+- `GET|POST|PUT|DELETE /api/rooms` - Room management
+- `GET|POST|PUT|DELETE /api/reservations` - Reservation management
+
+## Development
+
+The application uses modern React patterns:
+
+- **Context API** for authentication state
+- **Custom hooks** for data fetching
+- **TypeScript** for type safety
+- **Form validation** with Zod schemas
+- **Component composition** with shadcn/ui
+
+## Theme
+
+The application uses a custom shadcn/ui theme with purple/blue color scheme as specified in the project requirements.
