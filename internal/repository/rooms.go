@@ -16,22 +16,24 @@ func NewRoomsRepository(db *gorm.DB) *RoomsRepository {
 	}
 }
 
-func (r *RoomsRepository) Create(name string, description string, capacity int) error {
+func (r *RoomsRepository) Create(name string, description string, subject string, capacity int, createdBy uint) (*models.Room, error) {
 	room := models.Room{
 		Name:        name,
 		Description: description,
+		Subject:     subject,
 		Capacity:    capacity,
+		CreatedBy:   createdBy,
 	}
 
 	if err := r.DB.Create(&room).Error; err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &room, nil
 }
 
 func (r *RoomsRepository) GetByID(id uint) (*models.Room, error) {
 	var room models.Room
-	if err := r.DB.First(&room, id).Error; err != nil {
+	if err := r.DB.Preload("Members.User").Preload("Notes.User").First(&room, id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
@@ -48,15 +50,15 @@ func (r *RoomsRepository) GetAll() ([]models.Room, error) {
 	return rooms, nil // Retorna a lista de salas
 }
 
-func (r *RoomsRepository) Update(id uint, name string, description string, capacity int) error {
-	room := models.Room{
-		Model:       gorm.Model{ID: id},
-		Name:        name,
-		Description: description,
-		Capacity:    capacity,
+func (r *RoomsRepository) Update(id uint, name string, description string, subject string, capacity int) error {
+	updates := map[string]interface{}{
+		"name":        name,
+		"description": description,
+		"subject":     subject,
+		"capacity":    capacity,
 	}
 
-	if err := r.DB.Save(&room).Error; err != nil {
+	if err := r.DB.Model(&models.Room{}).Where("id = ?", id).Updates(updates).Error; err != nil {
 		return err
 	}
 	return nil
@@ -78,7 +80,34 @@ func (r *RoomsRepository) GetByName(name string) (*models.Room, error) {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
-		return nil, err // Retorna o erro se houver outro problema
+		return nil, err
 	}
 	return &room, nil
+}
+
+func (r *RoomsRepository) JoinRoom(userID, roomID uint) error {
+	member := models.RoomMember{
+		UserID: userID,
+		RoomID: roomID,
+		Role:   "member",
+	}
+	return r.DB.Create(&member).Error
+}
+
+func (r *RoomsRepository) LeaveRoom(userID, roomID uint) error {
+	return r.DB.Where("user_id = ? AND room_id = ?", userID, roomID).Delete(&models.RoomMember{}).Error
+}
+
+func (r *RoomsRepository) IsUserInRoom(userID, roomID uint) bool {
+	var count int64
+	r.DB.Model(&models.RoomMember{}).Where("user_id = ? AND room_id = ?", userID, roomID).Count(&count)
+	return count > 0
+}
+
+func (r *RoomsRepository) GetUserRooms(userID uint) ([]models.Room, error) {
+	var rooms []models.Room
+	err := r.DB.Joins("JOIN room_members ON rooms.id = room_members.room_id").
+		Where("room_members.user_id = ?", userID).
+		Find(&rooms).Error
+	return rooms, err
 }

@@ -75,7 +75,7 @@ func New() Service {
 	// AutoMigrate will create or update the tables for the given models.
 	// It will only add missing fields, and won't delete/change existing ones.
 	log.Println("Running database migrations...")
-	err = db.AutoMigrate(&models.User{}, &models.Room{}, &models.Reservation{})
+	err = db.AutoMigrate(&models.User{}, &models.Room{}, &models.Reservation{}, &models.RoomMember{}, &models.Note{})
 	if err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}

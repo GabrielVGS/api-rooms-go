@@ -34,7 +34,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// Criação do repositórios
 
 	userRepo := repository.NewUserRepository(s.db.GetDB())
-	// TODO: Criar os repositórios de Rooms e Reservations
+	roomsRepo := repository.NewRoomsRepository(s.db.GetDB())
+	notesRepo := repository.NewNotesRepository(s.db.GetDB())
 
 	// Criação dos Handlers
 	userHandler := handlers.UserHandler{
@@ -44,7 +45,15 @@ func (s *Server) RegisterRoutes() http.Handler {
 	authHandler := handlers.AuthHandler{
 		UserRepository: userRepo,
 	}
-	// TODO: Criar os Handlers de Rooms e Reservations
+
+	roomsHandler := handlers.RoomsHandler{
+		RoomsRepository: roomsRepo,
+	}
+
+	notesHandler := handlers.NotesHandler{
+		NotesRepository: notesRepo,
+		RoomsRepository: roomsRepo,
+	}
 
 	// Registro das rotas
 	// Rotas terão o prefixo /api | EX /api/users, /api/rooms, /api/reservations
@@ -54,8 +63,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 			// Aqui irao ficar as rotas que precisam de autenticação
 			r.Use(middlewares.AuthMiddleware)
 			userHandler.RegisterUserRoutes(r)
-
-			// TODO: Registrar as rotas de Rooms e Reservations
+			roomsHandler.RegisterRoomsRoutes(r)
+			notesHandler.RegisterNotesRoutes(r)
 		})
 	})
 
