@@ -29,8 +29,9 @@ export const RoomDetails: React.FC = () => {
       setRoom(roomData);
       
       // Check if current user is a member
-      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const currentUser = JSON.parse(localStorage.getItem('auth_user') || '{}');
       const isMember = roomData.members?.some(member => member.user_id === currentUser.id) || false;
+      console.log("localstor",localStorage)
       setIsUserMember(isMember);
       
       setError(null);
