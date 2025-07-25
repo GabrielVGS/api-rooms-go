@@ -84,9 +84,9 @@ export const RoomDetails: React.FC = () => {
     try {
       await roomApi.joinRoom(roomId);
       setIsUserMember(true);
-      fetchRoomDetails(); // Refresh room data to show updated members
+      fetchRoomDetails();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Falha ao entrar na sala');
+      setError(err.response?.data?.message || 'Sala cheia');
     }
   };
 
@@ -96,8 +96,8 @@ export const RoomDetails: React.FC = () => {
     try {
       await roomApi.leaveRoom(roomId);
       setIsUserMember(false);
-      setNotes([]); // Clear notes when leaving
-      fetchRoomDetails(); // Refresh room data
+      setNotes([]); 
+      fetchRoomDetails(); 
     } catch (err: any) {
       setError(err.response?.data?.message || 'Falha ao sair da sala');
     }

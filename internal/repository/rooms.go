@@ -111,3 +111,9 @@ func (r *RoomsRepository) GetUserRooms(userID uint) ([]models.Room, error) {
 		Find(&rooms).Error
 	return rooms, err
 }
+
+func (r *RoomsRepository) GetRoomMemberCount(roomID uint) (int64, error) {
+	var count int64
+	err := r.DB.Model(&models.RoomMember{}).Where("room_id = ?", roomID).Count(&count).Error
+	return count, err
+}

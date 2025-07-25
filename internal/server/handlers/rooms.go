@@ -61,6 +61,11 @@ func (rh *RoomsHandler) CreateRoomsHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	if req.Capacity <= 0 {
+		utils.RespondWithError(w, http.StatusBadRequest, "Capacity must be greater than 0")
+		return
+	}
+
 	room, err := rh.RoomsRepository.Create(req.Name, req.Description, req.Subject, req.Capacity, userID)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, "Failed to create room")
@@ -252,6 +257,19 @@ func (rh *RoomsHandler) UpdateRoomsHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	if req.Capacity > 0 {
+		currentMembers, err := rh.RoomsRepository.GetRoomMemberCount(uint(roomID))
+		if err != nil {
+			utils.RespondWithError(w, http.StatusInternalServerError, "Failed to check current member count")
+			return
+		}
+
+		if req.Capacity < int(currentMembers) {
+			utils.RespondWithError(w, http.StatusBadRequest, "New capacity cannot be less than current member count")
+			return
+		}
+	}
+
 	if err := rh.RoomsRepository.Update(uint(roomID), req.Name, req.Description, req.Subject, req.Capacity); err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, "Failed to update room")
 		return
@@ -357,6 +375,17 @@ func (rh *RoomsHandler) JoinRoomHandler(w http.ResponseWriter, r *http.Request) 
 
 	if rh.RoomsRepository.IsUserInRoom(userID, uint(roomID)) {
 		utils.RespondWithError(w, http.StatusConflict, "User already in room")
+		return
+	}
+
+	currentMembers, err := rh.RoomsRepository.GetRoomMemberCount(uint(roomID))
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, "Failed to check room capacity")
+		return
+	}
+
+	if int(currentMembers) >= room.Capacity {
+		utils.RespondWithError(w, http.StatusConflict, "Room is at full capacity")
 		return
 	}
 
