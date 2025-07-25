@@ -33,7 +33,7 @@ export const ReservationList: React.FC = () => {
       setRooms(roomsData);
       setError(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch data');
+      setError(err.response?.data?.message || 'Falha ao carregar dados');
     } finally {
       setLoading(false);
     }
@@ -44,13 +44,13 @@ export const ReservationList: React.FC = () => {
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to cancel this reservation?')) return;
+    if (!confirm('Tem certeza que deseja cancelar esta reserva?')) return;
 
     try {
       await reservationApi.deleteReservation(id);
       setReservations(reservations.filter(reservation => reservation.id !== id));
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to cancel reservation');
+      setError(err.response?.data?.message || 'Falha ao cancelar reserva');
     }
   };
 
@@ -72,7 +72,7 @@ export const ReservationList: React.FC = () => {
 
   const getRoomName = (roomId: number) => {
     const room = rooms.find(r => r.id === roomId);
-    return room?.name || 'Unknown Room';
+    return room?.name || 'Sala Desconhecida';
   };
 
 
@@ -90,7 +90,7 @@ export const ReservationList: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-muted-foreground">Loading reservations...</div>
+        <div className="text-muted-foreground">Carregando reservas...</div>
       </div>
     );
   }
@@ -99,12 +99,12 @@ export const ReservationList: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Reservations</h1>
-          <p className="text-muted-foreground">Manage room reservations and bookings</p>
+          <h1 className="text-3xl font-bold">Reservas</h1>
+          <p className="text-muted-foreground">Gerencie reservas de salas e agendamentos</p>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
-          New Reservation
+          Nova Reserva
         </Button>
       </div>
 
@@ -116,22 +116,22 @@ export const ReservationList: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Your Reservations</CardTitle>
+          <CardTitle>Suas Reservas</CardTitle>
         </CardHeader>
         <CardContent>
           {reservations.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              No reservations found. Create your first reservation to get started.
+              Nenhuma reserva encontrada. Crie sua primeira reserva para começar.
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Room</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Time</TableHead>
-                  <TableHead>Duration</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>Sala</TableHead>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Horário</TableHead>
+                  <TableHead>Duração</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

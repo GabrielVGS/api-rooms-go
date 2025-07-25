@@ -1,13 +1,11 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "REST API for room reservation management with user authentication",
-        "title": "Room Reservation API",
-        "termsOfService": "http://swagger.io/terms/",
+        "description": "REST API para gerenciamento de salas",
+        "title": "API ROOMS",
         "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
+            "name": "Gabriel Viana",
+            "email": "gabriel.viana.rs@gmail.com"
         },
         "license": {
             "name": "MIT",
@@ -1244,6 +1242,9 @@
             "properties": {
                 "token": {
                     "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/dtos.UserResponse"
                 }
             }
         },
@@ -1256,14 +1257,14 @@
                 "email": {
                     "type": "string"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 },
                 "user_id": {
                     "type": "integer"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         },
@@ -1273,10 +1274,10 @@
                 "email": {
                     "type": "string"
                 },
-                "password": {
+                "name": {
                     "type": "string"
                 },
-                "username": {
+                "password": {
                     "type": "string"
                 }
             }

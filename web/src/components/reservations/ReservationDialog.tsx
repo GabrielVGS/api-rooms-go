@@ -16,15 +16,15 @@ import { reservationApi } from '@/services/api';
 import type { Reservation, Room } from '@/types/api';
 
 const reservationSchema = z.object({
-  roomId: z.number().min(1, 'Please select a room'),
-  startTime: z.string().min(1, 'Start time is required'),
-  endTime: z.string().min(1, 'End time is required'),
+  roomId: z.number().min(1, 'Por favor, selecione uma sala'),
+  startTime: z.string().min(1, 'Horário de início é obrigatório'),
+  endTime: z.string().min(1, 'Horário de fim é obrigatório'),
 }).refine((data) => {
   const start = new Date(data.startTime);
   const end = new Date(data.endTime);
   return end > start;
 }, {
-  message: "End time must be after start time",
+  message: "Horário de fim deve ser após o horário de início",
   path: ["endTime"],
 });
 
@@ -97,7 +97,7 @@ export const ReservationDialog: React.FC<ReservationDialogProps> = ({
       }
       onSave();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to save reservation');
+      setError(err.response?.data?.message || 'Falha ao salvar reserva');
     } finally {
       setIsLoading(false);
     }
@@ -108,12 +108,12 @@ export const ReservationDialog: React.FC<ReservationDialogProps> = ({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'Edit Reservation' : 'Create New Reservation'}
+            {isEditing ? 'Editar Reserva' : 'Criar Nova Reserva'}
           </DialogTitle>
           <DialogDescription>
             {isEditing
-              ? 'Update the reservation details below.'
-              : 'Book a room for your meeting or event.'}
+              ? 'Atualize os detalhes da reserva abaixo.'
+              : 'Reserve uma sala para sua reunião ou evento.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -125,7 +125,7 @@ export const ReservationDialog: React.FC<ReservationDialogProps> = ({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="roomId">Room</Label>
+            <Label htmlFor="roomId">Sala</Label>
             <select
               id="roomId"
               {...register('roomId', { valueAsNumber: true })}
@@ -133,10 +133,10 @@ export const ReservationDialog: React.FC<ReservationDialogProps> = ({
                 errors.roomId ? 'border-destructive' : ''
               }`}
             >
-              <option value="">Select a room</option>
+              <option value="">Selecione uma sala</option>
               {rooms.map((room) => (
                 <option key={room.id} value={room.id}>
-                  {room.name} (Capacity: {room.capacity})
+                  {room.name} (Capacidade: {room.capacity})
                 </option>
               ))}
             </select>
@@ -146,7 +146,7 @@ export const ReservationDialog: React.FC<ReservationDialogProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="startTime">Start Time</Label>
+            <Label htmlFor="startTime">Horário de Início</Label>
             <Input
               id="startTime"
               type="datetime-local"
@@ -159,7 +159,7 @@ export const ReservationDialog: React.FC<ReservationDialogProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="endTime">End Time</Label>
+            <Label htmlFor="endTime">Horário de Fim</Label>
             <Input
               id="endTime"
               type="datetime-local"
@@ -178,16 +178,16 @@ export const ReservationDialog: React.FC<ReservationDialogProps> = ({
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading
                 ? isEditing
-                  ? 'Updating...'
-                  : 'Creating...'
+                  ? 'Atualizando...'
+                  : 'Criando...'
                 : isEditing
-                ? 'Update Reservation'
-                : 'Create Reservation'}
+                ? 'Atualizar Reserva'
+                : 'Criar Reserva'}
             </Button>
           </div>
         </form>

@@ -12,12 +12,12 @@ import { authApi } from '@/services/api';
 import type { RegisterRequest } from '@/types/api';
 
 const registerSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  email: z.email('Por favor, insira um endereço de email válido'),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
+  message: "Senhas não coincidem",
   path: ["confirmPassword"],
 });
 
@@ -49,7 +49,7 @@ export const RegisterForm: React.FC = () => {
       login(response.token, response.user);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      setError(err.response?.data?.message || 'Falha no cadastro. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -59,9 +59,9 @@ export const RegisterForm: React.FC = () => {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Create an account</CardTitle>
+          <CardTitle className="text-2xl">Criar uma conta</CardTitle>
           <CardDescription>
-            Sign up to get started with room reservations
+            Cadastre-se para começar com reservas de salas
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -73,11 +73,11 @@ export const RegisterForm: React.FC = () => {
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">Nome Completo</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Enter your full name"
+                placeholder="Digite seu nome completo"
                 {...register('name')}
                 className={errors.name ? 'border-destructive' : ''}
               />
@@ -91,7 +91,7 @@ export const RegisterForm: React.FC = () => {
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Digite seu email"
                 {...register('email')}
                 className={errors.email ? 'border-destructive' : ''}
               />
@@ -101,11 +101,11 @@ export const RegisterForm: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Senha</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Digite sua senha"
                 {...register('password')}
                 className={errors.password ? 'border-destructive' : ''}
               />
@@ -115,11 +115,11 @@ export const RegisterForm: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Confirm your password"
+                placeholder="Confirme sua senha"
                 {...register('confirmPassword')}
                 className={errors.confirmPassword ? 'border-destructive' : ''}
               />
@@ -133,17 +133,17 @@ export const RegisterForm: React.FC = () => {
               className="w-full" 
               disabled={isLoading}
             >
-              {isLoading ? 'Creating account...' : 'Create account'}
+              {isLoading ? 'Criando conta...' : 'Criar conta'}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm">
-            Already have an account?{' '}
+            Já tem uma conta?{' '}
             <Link 
               to="/login" 
               className="text-primary hover:underline"
             >
-              Sign in
+              Entrar
             </Link>
           </div>
         </CardContent>

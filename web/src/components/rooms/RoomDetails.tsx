@@ -64,7 +64,7 @@ export const RoomDetails: React.FC = () => {
     
     try {
       const notesData = await notesApi.getNotesByRoom(roomId);
-      setNotes(notesData);
+      setNotes(notesData.reverse());
     } catch (err: any) {
       console.error('Failed to fetch notes:', err);
     }
@@ -157,7 +157,7 @@ export const RoomDetails: React.FC = () => {
           <p className="text-muted-foreground mb-4">A sala que você está procurando não existe ou foi removida.</p>
           <Button onClick={() => navigate('/rooms')} variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Rooms
+            Voltar para Salas
           </Button>
         </div>
       </div>
@@ -208,7 +208,7 @@ export const RoomDetails: React.FC = () => {
                 <>
                   <Button variant="outline" onClick={handleCreateNote} className="hidden sm:flex">
                     <Plus className="mr-2 h-4 w-4" />
-                    Add Note
+                    Adicionar Nota
                   </Button>
                   <Button variant="outline" onClick={handleLeaveRoom} className="text-destructive hover:text-destructive">
                     <UserMinus className="mr-2 h-4 w-4" />
@@ -218,7 +218,7 @@ export const RoomDetails: React.FC = () => {
               ) : (
                 <Button onClick={handleJoinRoom} className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
                   <UserPlus className="mr-2 h-4 w-4" />
-                  Join Room
+                  Entrar na Sala
                 </Button>
               )}
             </div>
@@ -358,7 +358,7 @@ export const RoomDetails: React.FC = () => {
                     </p>
                     <Button onClick={handleJoinRoom} className="bg-gradient-to-r from-primary to-primary/80">
                       <UserPlus className="mr-2 h-4 w-4" />
-                      Join Room
+                      Entrar na Sala
                     </Button>
                   </div>
                 ) : filteredNotes.length > 0 ? (

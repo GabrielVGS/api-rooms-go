@@ -12,8 +12,8 @@ import { authApi } from '@/services/api';
 import type { LoginRequest } from '@/types/api';
 
 const loginSchema = z.object({
-  email: z.email('Please enter a valid email address'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.email('Por favor, insira um endereço de email válido'),
+  password: z.string().min(1, 'Senha é obrigatória'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -42,7 +42,7 @@ export const LoginForm: React.FC = () => {
       login(response.token, response.user);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      setError(err.response?.data?.message || 'Falha no login. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -52,9 +52,9 @@ export const LoginForm: React.FC = () => {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
+          <CardTitle className="text-2xl">Bem-vindo de volta</CardTitle>
           <CardDescription>
-            Sign in to your account to continue
+            Entre na sua conta para continuar
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -70,7 +70,7 @@ export const LoginForm: React.FC = () => {
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Digite seu email"
                 {...register('email')}
                 className={errors.email ? 'border-destructive' : ''}
               />
@@ -80,11 +80,11 @@ export const LoginForm: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Senha</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Digite sua senha"
                 {...register('password')}
                 className={errors.password ? 'border-destructive' : ''}
               />
@@ -98,17 +98,17 @@ export const LoginForm: React.FC = () => {
               className="w-full" 
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm">
-            Don't have an account?{' '}
+            Não tem uma conta?{' '}
             <Link 
               to="/register" 
               className="text-primary hover:underline"
             >
-              Sign up
+              Cadastre-se
             </Link>
           </div>
         </CardContent>
