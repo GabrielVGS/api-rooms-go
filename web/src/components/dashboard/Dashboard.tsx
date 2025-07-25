@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus } from 'lucide-react';
+import { Users, Plus, FileText, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { notesApi, roomApi, usersApi } from '@/services/api';
-import type { Room, Reservation } from '@/types/api';
-
+import type { Room } from '@/types/api';
 
 export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState({
     totalRooms: 0,
-    totalUsers: 0
+    totalUsers: 0,
+    totalNotes: 0,
   });
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,17 +18,17 @@ export const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const roomsData = await roomApi.getRooms()
-        const usersData = await usersApi.getUsers()
-        console.log(usersData)
-
-
-
-
+        const roomsData = await roomApi.getRooms();
+        const usersData = await usersApi.getUsers();
+        const notesData = await notesApi.getAllNotes();
+        
+  
+        
         setRooms(roomsData);
         setStats({
           totalRooms: roomsData.length,
-          totalUsers: usersData.length
+          totalUsers: usersData.length,
+          totalNotes: notesData.length,
         });
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
@@ -40,7 +40,6 @@ export const Dashboard: React.FC = () => {
     fetchData();
   }, []);
 
-
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -49,22 +48,17 @@ export const Dashboard: React.FC = () => {
     );
   }
 
-  console.log(stats)
-
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Bem vindo de volta
-        </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Salas totais</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Salas Totais</CardTitle>
+            <Home className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalRooms}</div>
@@ -73,9 +67,10 @@ export const Dashboard: React.FC = () => {
             </p>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Usários totais</CardTitle>
+            <CardTitle className="text-sm font-medium">Usuários Totais</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -85,31 +80,38 @@ export const Dashboard: React.FC = () => {
             </p>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Notas</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalNotes}</div>
+            <p className="text-xs text-muted-foreground">
+              Notas no sistema
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Ações rápidas</CardTitle>
-            <CardDescription>Ações</CardDescription>
+            <CardTitle>Ações Rápidas</CardTitle>
+            <CardDescription>Acesse funcionalidades principais</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Link to="/reservations">
-              <Button className="w-full justify-start">
-                <Plus className="mr-2 h-4 w-4" />
-                Nova reserva
-              </Button>
-            </Link>
             <Link to="/rooms">
               <Button variant="outline" className="w-full justify-start">
-                <Users className="mr-2 h-4 w-4" />
-                Gerenciar salas
+                <Home className="mr-2 h-4 w-4" />
+                Gerenciar Salas
               </Button>
             </Link>
           </CardContent>
         </Card>
 
-
+  
       </div>
     </div>
   );

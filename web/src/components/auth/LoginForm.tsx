@@ -38,7 +38,7 @@ export const LoginForm: React.FC = () => {
 
     try {
       const response = await authApi.login(data as LoginRequest);
-      console.log(response)
+      console.log("resopsta",response)
       login(response.token, response.user);
       navigate('/dashboard');
     } catch (err: any) {

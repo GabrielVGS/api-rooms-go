@@ -130,7 +130,7 @@ func (ah *AuthHandler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := &models.User{
-		Name:     registerRequest.Username,
+		Name:     registerRequest.Name,
 		Email:    registerRequest.Email,
 		Password: hashedPassword,
 	}
@@ -154,6 +154,11 @@ func (ah *AuthHandler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	response := dtos.AuthLoginResponse{
 		Token: token,
+		User: dtos.UserResponse{
+			ID:    createdUser.ID,
+			Name:  createdUser.Name,
+			Email: createdUser.Email,
+		},
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -199,7 +204,7 @@ func (ah *AuthHandler) GetProfileHandler(w http.ResponseWriter, r *http.Request)
 	// Create response
 	response := dtos.AuthProfileResponse{
 		UserID:    user.ID,
-		Username:  user.Name,
+		Name:      user.Name,
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		UpdatedAt: user.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),

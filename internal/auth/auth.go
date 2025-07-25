@@ -13,18 +13,18 @@ var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 var expirationTime, _ = strconv.Atoi(os.Getenv("JWT_EXPIRATION"))
 
 type Claims struct {
-	UserID   uint   `json:"user_id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	UserID uint   `json:"user_id"`
+	Name   string `json:"name"`
+	Email  string `json:"email"`
 
 	jwt.RegisteredClaims
 }
 
 func GenerateToken(user *models.User) (string, error) {
 	claims := Claims{
-		UserID:   user.ID,
-		Username: user.Name,
-		Email:    user.Email,
+		UserID: user.ID,
+		Name:   user.Name,
+		Email:  user.Email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "api-go",
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(expirationTime) * time.Second)),

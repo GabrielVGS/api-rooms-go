@@ -43,7 +43,9 @@ export const RegisterForm: React.FC = () => {
 
     try {
       const { confirmPassword, ...registerData } = data;
+      console.log("register data ",registerData)
       const response = await authApi.register(registerData as RegisterRequest);
+      console.log("register",response)
       login(response.token, response.user);
       navigate('/dashboard');
     } catch (err: any) {

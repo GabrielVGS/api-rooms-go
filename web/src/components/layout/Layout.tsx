@@ -18,6 +18,8 @@ export const Layout: React.FC = () => {
     return location.pathname === path;
   };
 
+  console.log(user)
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
@@ -26,7 +28,7 @@ export const Layout: React.FC = () => {
             <div className="flex items-center space-x-8">
               <Link to="/dashboard" className="flex items-center space-x-2">
                 <Calendar className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">Room Booking</span>
+                <span className="text-xl font-bold">Rooms API-GO</span>
               </Link>
               
               <nav className="hidden md:flex space-x-4">
@@ -57,7 +59,7 @@ export const Layout: React.FC = () => {
 
             <div className="flex items-center space-x-4">
               <span className="text-sm text-muted-foreground">
-                Welcome, {user?.name}
+                Bem vindo de volta, {user?.name} 👋
               </span>
               <Button
                 variant="ghost"
