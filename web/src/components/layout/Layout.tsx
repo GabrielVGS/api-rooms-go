@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogOut, Calendar, Home, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 
 export const Layout: React.FC = () => {
   const { user, logout } = useAuth();
@@ -50,18 +50,7 @@ export const Layout: React.FC = () => {
                   }`}
                 >
                   <Users className="inline-block w-4 h-4 mr-2" />
-                  Rooms
-                </Link>
-                <Link
-                  to="/reservations"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive('/reservations')
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <Calendar className="inline-block w-4 h-4 mr-2" />
-                  Reservations
+                  Salas
                 </Link>
               </nav>
             </div>

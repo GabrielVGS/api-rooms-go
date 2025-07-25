@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { roomApi, reservationApi } from '@/services/api';
 import type { Room, Reservation } from '@/types/api';
 
+
 export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState({
     totalRooms: 0,
@@ -62,6 +63,8 @@ export const Dashboard: React.FC = () => {
       </div>
     );
   }
+
+  // console.log(stats)
 
   return (
     <div className="space-y-6">

@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import {type ReactNode} from "react"
+import React, { createContext, useState, useEffect, type ReactNode } from 'react';
 import type { User } from '../types/api';
 
 interface AuthContextType {
@@ -8,17 +7,10 @@ interface AuthContextType {
   login: (token: string, user: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -27,7 +19,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('auth_token');
@@ -38,12 +30,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         setUser(JSON.parse(storedUser));
       } catch (error) {
-        console.log("maybe")
+        console.error('Failed to parse stored user data:', error);
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
       }
     }
-    setIsLoading(false)
+    setIsLoading(false);
   }, []);
 
   const login = (newToken: string, newUser: User) => {
@@ -66,11 +58,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     isAuthenticated: !!token && !!user,
+    isLoading, 
   };
 
-  if (isLoading) {
-    return null
-  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
