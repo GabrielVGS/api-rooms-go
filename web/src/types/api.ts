@@ -4,6 +4,8 @@ export interface User {
   email: string;
 }
 
+
+
 export interface Room {
   id: number;
   name: string;
@@ -42,6 +44,8 @@ export interface AuthResponse {
   token: string;
   user: User;
 }
+
+
 
 export interface RoomMember {
   user_id: number;

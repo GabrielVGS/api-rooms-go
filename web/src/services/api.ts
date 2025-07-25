@@ -1,13 +1,14 @@
 import axios from 'axios';
-import type { 
-  LoginRequest, 
-  RegisterRequest, 
-  AuthResponse, 
-  Room, 
+import type {
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse,
+  Room,
   Reservation,
   Note,
   CreateNoteRequest,
-  UpdateNoteRequest
+  UpdateNoteRequest,
+  User,
 } from '../types/api';
 
 const API_BASE_URL = 'http://localhost:8080/api';
@@ -26,7 +27,7 @@ api.interceptors.request.use(
       headers: config.headers,
       data: config.data
     });
-    
+
     const token = localStorage.getItem('auth_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -89,6 +90,19 @@ export const authApi = {
   },
 };
 
+export const usersApi = {
+  getUsers: async (): Promise<User[]> => {
+    try {
+      console.log("Getting all users")
+      const response = await api.get("/users")
+      return response.data.users
+    } catch (error) {
+      console.error("Error getting users");
+      throw error;
+    }
+  }
+}
+
 export const roomApi = {
   getRooms: async (): Promise<Room[]> => {
     try {
@@ -123,7 +137,7 @@ export const roomApi = {
     } catch (error) {
       console.error('Failed to fetch user rooms:', error);
       throw error;
-    }  
+    }
   },
 
   joinRoom: async (roomId: number): Promise<void> => {
@@ -282,6 +296,19 @@ export const notesApi = {
       return response.data;
     } catch (error) {
       console.error(`Failed to fetch note ID ${id}:`, error);
+      throw error;
+    }
+  },
+
+  getAllNotes: async (): Promise<Note[]> => {
+    try {
+
+      console.log("Getting all notes")
+      const response = await api.get("/notes")
+      console.log("Succesfully fetched all notes")
+      return response.data
+    } catch (error) {
+      console.error(`Failed to fetch all notes`, error);
       throw error;
     }
   },

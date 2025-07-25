@@ -6,10 +6,13 @@ import (
 	"api-go/internal/server/middlewares"
 	"api-go/internal/utils"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"gorm.io/gorm"
 )
 
 type NotesHandler struct {
@@ -20,6 +23,7 @@ type NotesHandler struct {
 func (nh *NotesHandler) RegisterNotesRoutes(r chi.Router) {
 	r.Route("/notes", func(r chi.Router) {
 		r.Post("/", nh.CreateNoteHandler)
+		r.Get("/", nh.GetAllNotes)
 		r.Get("/{note_id}", nh.GetNoteByIDHandler)
 		r.Put("/{note_id}", nh.UpdateNoteHandler)
 		r.Delete("/{note_id}", nh.DeleteNoteHandler)
@@ -372,4 +376,41 @@ func (nh *NotesHandler) GetUserNotesHandler(w http.ResponseWriter, r *http.Reque
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
+}
+
+func (nh *NotesHandler) GetAllNotes(w http.ResponseWriter, r *http.Request) {
+
+	notes, err := nh.NotesRepository.GetAll()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.RespondWithError(w, http.StatusNotFound, "Nenhum usuario")
+			return
+		}
+		utils.RespondWithError(w, http.StatusInternalServerError, "Erro interno")
+		return
+	}
+
+	noteList := make([]dtos.NoteResponse, len(notes))
+	for i, note := range notes {
+		noteList[i] = dtos.NoteResponse{
+			ID:        note.ID,
+			UserID:    note.UserID,
+			RoomID:    note.RoomID,
+			Title:     note.Title,
+			Content:   note.Content,
+			UserName:  note.User.Name,
+			UserEmail: note.User.Email,
+			RoomName:  note.Room.Name,
+			CreatedAt: note.CreatedAt.GoString(),
+			UpdatedAt: note.UpdatedAt.GoString(),
+		}
+	}
+
+	response := noteList
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, fmt.Sprintf("Falha ao codificar resposta: %v", err), http.StatusInternalServerError)
+	}
+
 }

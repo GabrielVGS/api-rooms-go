@@ -23,6 +23,7 @@ func (uh *UserHandler) RegisterUserRoutes(r chi.Router) {
 	r.Route("/users", func(r chi.Router) {
 		r.Post("/", uh.CreateUserHandler)
 		r.Get("/", uh.GetUserByIDHandler)
+		r.Get("/", uh.GetAllUsersHandler)
 		r.Put("/{user_id}", uh.UpdateUserHandler)
 		r.Delete("/{user_id}", uh.DeleteUserHandler)
 		r.Get("/by-email", uh.GetUserByEmailHandler)
@@ -176,6 +177,37 @@ func (uh *UserHandler) GetUserByIDHandler(w http.ResponseWriter, r *http.Request
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, fmt.Sprintf("Falha ao codificar resposta: %v", err), http.StatusInternalServerError)
 	}
+}
+
+func (uh *UserHandler) GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+
+	users, err := uh.UserRepository.GetAll()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.RespondWithError(w, http.StatusNotFound, "Nenhum usuario")
+			return
+		}
+		utils.RespondWithError(w, http.StatusInternalServerError, "Erro interno")
+		return
+	}
+
+	userList := make([]dtos.UserResponse, len(users))
+	for i, u := range users {
+		userList[i] = dtos.UserResponse{
+			ID:    u.ID,
+			Name:  u.Name,
+			Email: u.Email,
+		}
+	}
+	response := dtos.UserListResponse{
+		Users: userList,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, fmt.Sprintf("Falha ao codificar resposta: %v", err), http.StatusInternalServerError)
+	}
+
 }
 
 // UpdateUserHandler updates user information

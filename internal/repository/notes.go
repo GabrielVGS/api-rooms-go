@@ -86,3 +86,11 @@ func (r *NotesRepository) GetByUserAndRoom(userID, roomID uint) ([]models.Note, 
 	}
 	return notes, nil
 }
+
+func (r *NotesRepository) GetAll() ([]models.Note, error) {
+	var notes []models.Note
+	if err := r.DB.Preload("User").Preload("Room").Find(&notes).Error; err != nil {
+		return nil, err
+	}
+	return notes, nil
+}

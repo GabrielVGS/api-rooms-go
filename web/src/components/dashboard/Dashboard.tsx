@@ -1,41 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Users, Clock, Plus } from 'lucide-react';
+import { Users, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { roomApi, reservationApi } from '@/services/api';
+import { notesApi, roomApi, usersApi } from '@/services/api';
 import type { Room, Reservation } from '@/types/api';
 
 
 export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState({
     totalRooms: 0,
-    totalReservations: 0,
-    upcomingReservations: 0,
+    totalUsers: 0
   });
-  const [upcomingReservations, setUpcomingReservations] = useState<Reservation[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [roomsData, reservationsData] = await Promise.all([
-          roomApi.getRooms(),
-          reservationApi.getReservations(),
-        ]);
+        const roomsData = await roomApi.getRooms()
+        const usersData = await usersApi.getUsers()
+        console.log(usersData)
 
-        const now = new Date();
-        const upcoming = reservationsData.filter(
-          (reservation) => new Date(reservation.start_time) > now
-        ).slice(0, 5);
+
+
 
         setRooms(roomsData);
-        setUpcomingReservations(upcoming);
         setStats({
           totalRooms: roomsData.length,
-          totalReservations: reservationsData.length,
-          upcomingReservations: upcoming.length,
+          totalUsers: usersData.length
         });
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
@@ -47,14 +40,6 @@ export const Dashboard: React.FC = () => {
     fetchData();
   }, []);
 
-  const getRoomName = (roomId: number) => {
-    const room = rooms.find(r => r.id === roomId);
-    return room?.name || 'Unknown Room';
-  };
-
-  const formatDateTime = (dateTime: string) => {
-    return new Date(dateTime).toLocaleString();
-  };
 
   if (loading) {
     return (
@@ -64,7 +49,7 @@ export const Dashboard: React.FC = () => {
     );
   }
 
-  // console.log(stats)
+  console.log(stats)
 
   return (
     <div className="space-y-6">
@@ -88,29 +73,15 @@ export const Dashboard: React.FC = () => {
             </p>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Reservas totais</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Usários totais</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalReservations}</div>
+            <div className="text-2xl font-bold">{stats.totalUsers}</div>
             <p className="text-xs text-muted-foreground">
-              All time bookings
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Upcoming</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.upcomingReservations}</div>
-            <p className="text-xs text-muted-foreground">
-              Reservas futuras
+              Usuários do sistema
             </p>
           </CardContent>
         </Card>
@@ -138,38 +109,7 @@ export const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Reservations</CardTitle>
-            <CardDescription>Your next scheduled bookings</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {upcomingReservations.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No upcoming reservations
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {upcomingReservations.map((reservation) => (
-                  <div
-                    key={reservation.id}
-                    className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-                  >
-                    <div>
-                      <p className="text-sm font-medium">
-                        {getRoomName(reservation.room_id)}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDateTime(reservation.start_time)}
-                      </p>
-                    </div>
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+
       </div>
     </div>
   );

@@ -12,6 +12,10 @@ type UserResponse struct {
 	Email string `json:"email"`
 }
 
+type UserListResponse struct {
+	Users []UserResponse `json:"users"`
+}
+
 type UpdateUserRequest struct {
 	Name     string `json:"name,omitempty"`
 	Email    string `json:"email,omitempty"`
