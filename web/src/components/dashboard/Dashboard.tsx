@@ -26,7 +26,7 @@ export const Dashboard: React.FC = () => {
 
         const now = new Date();
         const upcoming = reservationsData.filter(
-          (reservation) => new Date(reservation.startTime) > now
+          (reservation) => new Date(reservation.start_time) > now
         ).slice(0, 5);
 
         setRooms(roomsData);
@@ -58,7 +58,7 @@ export const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-muted-foreground">Loading dashboard...</div>
+        <div className="text-muted-foreground">Carregando...</div>
       </div>
     );
   }
@@ -68,27 +68,27 @@ export const Dashboard: React.FC = () => {
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome to your room booking dashboard
+          Bem vindo de volta
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Rooms</CardTitle>
+            <CardTitle className="text-sm font-medium">Salas totais</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalRooms}</div>
             <p className="text-xs text-muted-foreground">
-              Available meeting rooms
+              Salas disponíveis
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Reservations</CardTitle>
+            <CardTitle className="text-sm font-medium">Reservas totais</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -107,7 +107,7 @@ export const Dashboard: React.FC = () => {
           <CardContent>
             <div className="text-2xl font-bold">{stats.upcomingReservations}</div>
             <p className="text-xs text-muted-foreground">
-              Future reservations
+              Reservas futuras
             </p>
           </CardContent>
         </Card>
@@ -116,20 +116,20 @@ export const Dashboard: React.FC = () => {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tasks you might want to perform</CardDescription>
+            <CardTitle>Ações rápidas</CardTitle>
+            <CardDescription>Ações</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Link to="/reservations">
               <Button className="w-full justify-start">
                 <Plus className="mr-2 h-4 w-4" />
-                New Reservation
+                Nova reserva
               </Button>
             </Link>
             <Link to="/rooms">
               <Button variant="outline" className="w-full justify-start">
                 <Users className="mr-2 h-4 w-4" />
-                Manage Rooms
+                Gerenciar salas
               </Button>
             </Link>
           </CardContent>
@@ -154,10 +154,10 @@ export const Dashboard: React.FC = () => {
                   >
                     <div>
                       <p className="text-sm font-medium">
-                        {getRoomName(reservation.roomId)}
+                        {getRoomName(reservation.room_id)}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {formatDateTime(reservation.startTime)}
+                        {formatDateTime(reservation.start_time)}
                       </p>
                     </div>
                     <Clock className="h-4 w-4 text-muted-foreground" />

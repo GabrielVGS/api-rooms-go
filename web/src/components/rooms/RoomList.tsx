@@ -33,7 +33,7 @@ export const RoomList: React.FC = () => {
       setRooms(data);
       setError(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch rooms');
+      setError(err.response?.data?.message || 'Falha ao carregar salas');
     } finally {
       setLoading(false);
     }
@@ -44,13 +44,13 @@ export const RoomList: React.FC = () => {
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this room?')) return;
+    if (!confirm('Tem certeza que deseja excluir esta sala?')) return;
 
     try {
       await roomApi.deleteRoom(id);
       setRooms(rooms.filter(room => room.id !== id));
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to delete room');
+      setError(err.response?.data?.message || 'Falha ao excluir sala');
     }
   };
 
@@ -77,7 +77,7 @@ export const RoomList: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-muted-foreground">Loading rooms...</div>
+        <div className="text-muted-foreground">Carregando salas...</div>
       </div>
     );
   }
@@ -86,12 +86,12 @@ export const RoomList: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Rooms</h1>
-          <p className="text-muted-foreground">Manage meeting rooms and spaces</p>
+          <h1 className="text-3xl font-bold">Salas</h1>
+          <p className="text-muted-foreground">Gerencie salas de reunião e espaços</p>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Room
+          Adicionar Sala
         </Button>
       </div>
 
@@ -103,33 +103,33 @@ export const RoomList: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Available Rooms</CardTitle>
+          <CardTitle>Salas Disponíveis</CardTitle>
         </CardHeader>
         <CardContent>
           {rooms.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              No rooms found. Create your first room to get started.
+              Nenhuma sala encontrada. Crie sua primeira sala para começar.
             </div>
           ) : (
 
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Capacity</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Capacidade</TableHead>
                   <TableHead>Assunto</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>Descrição</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {rooms.map((room) => (
                   <TableRow key={room.id}>
                     <TableCell className="font-medium">{room.name}</TableCell>
-                    <TableCell>{room.capacity} people</TableCell>
+                    <TableCell>{room.capacity} pessoas</TableCell>
                     <TableCell>{room.subject}</TableCell>
                     <TableCell className="max-w-xs truncate">
-                      {room.description || 'No description'}
+                      {room.description || 'Sem descrição'}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">

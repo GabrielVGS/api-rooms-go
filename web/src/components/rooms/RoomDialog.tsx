@@ -16,8 +16,8 @@ import { roomApi } from '@/services/api';
 import type { Room } from '@/types/api';
 
 const roomSchema = z.object({
-  name: z.string().min(1, 'Room name is required'),
-  capacity: z.number().min(1, 'Capacity must be at least 1'),
+  name: z.string().min(1, 'Nome da sala é obrigatório'),
+  capacity: z.number().min(1, 'Capacidade deve ser pelo menos 1'),
   subject: z.string(),
   description: z.string().optional(),
 });
@@ -78,7 +78,7 @@ export const RoomDialog: React.FC<RoomDialogProps> = ({
       }
       onSave();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to save room');
+      setError(err.response?.data?.message || 'Falha ao salvar sala');
     } finally {
       setIsLoading(false);
     }
@@ -89,12 +89,12 @@ export const RoomDialog: React.FC<RoomDialogProps> = ({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'Edit Room' : 'Create New Room'}
+            {isEditing ? 'Editar Sala' : 'Criar Nova Sala'}
           </DialogTitle>
           <DialogDescription>
             {isEditing
-              ? 'Update the room details below.'
-              : 'Add a new room to the system.'}
+              ? 'Atualize os detalhes da sala abaixo.'
+              : 'Adicione uma nova sala ao sistema.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -106,10 +106,10 @@ export const RoomDialog: React.FC<RoomDialogProps> = ({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">Room Name</Label>
+            <Label htmlFor="name">Nome da Sala</Label>
             <Input
               id="name"
-              placeholder="Enter room name"
+              placeholder="Digite o nome da sala"
               {...register('name')}
               className={errors.name ? 'border-destructive' : ''}
             />
@@ -119,12 +119,12 @@ export const RoomDialog: React.FC<RoomDialogProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="capacity">Capacity</Label>
+            <Label htmlFor="capacity">Capacidade</Label>
             <Input
               id="capacity"
               type="number"
               min="1"
-              placeholder="Enter room capacity"
+              placeholder="Digite a capacidade da sala"
               {...register('capacity', { valueAsNumber: true })}
               className={errors.capacity ? 'border-destructive' : ''}
             />
@@ -148,10 +148,10 @@ export const RoomDialog: React.FC<RoomDialogProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description (Optional)</Label>
+            <Label htmlFor="description">Descrição (Opcional)</Label>
             <Input
               id="description"
-              placeholder="Enter room description"
+              placeholder="Digite a descrição da sala"
               {...register('description')}
             />
           </div>
@@ -163,16 +163,16 @@ export const RoomDialog: React.FC<RoomDialogProps> = ({
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading
                 ? isEditing
-                  ? 'Updating...'
-                  : 'Creating...'
+                  ? 'Atualizando...'
+                  : 'Criando...'
                 : isEditing
-                  ? 'Update Room'
-                  : 'Create Room'}
+                  ? 'Atualizar Sala'
+                  : 'Criar Sala'}
             </Button>
           </div>
         </form>

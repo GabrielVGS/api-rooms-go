@@ -27,6 +27,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const storedToken = localStorage.getItem('auth_token');
@@ -42,6 +43,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.removeItem('auth_user');
       }
     }
+    setIsLoading(false)
   }, []);
 
   const login = (newToken: string, newUser: User) => {
@@ -65,6 +67,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     isAuthenticated: !!token && !!user,
   };
+
+  if (isLoading) {
+    return null
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
