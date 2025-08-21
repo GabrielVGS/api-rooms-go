@@ -1,19 +1,18 @@
 package server
 
 import (
-	"net/http"
-
-	// Imports corretos para seus pacotes internos
 	"api-go/internal/repository"
 	"api-go/internal/server/handlers"
+	"net/http"
 
 	"api-go/internal/server/middlewares"
+
+	_ "api-go/docs"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
-	_ "api-go/docs" // Import generated docs
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -31,9 +30,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	// Rota de healthcheck
 	r.Get("/health", s.healthHandler)
-	
+
 	// Swagger documentation
-	r.Get("/swagger/*", httpSwagger.WrapHandler)
+	r.Get("/docs/*", httpSwagger.WrapHandler)
 
 	// Criação do repositórios
 
@@ -60,11 +59,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 	}
 
 	// Registro das rotas
-	// Rotas terão o prefixo /api | EX /api/users, /api/rooms, /api/reservations
 	r.Route("/api", func(r chi.Router) {
 		authHandler.RegisterAuthRoutes(r)
 		r.Group(func(r chi.Router) {
-			// Aqui irao ficar as rotas que precisam de autenticação
 			r.Use(middlewares.AuthMiddleware)
 			userHandler.RegisterUserRoutes(r)
 			roomsHandler.RegisterRoomsRoutes(r)

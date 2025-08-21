@@ -8,7 +8,6 @@ import (
 	"api-go/internal/server/middlewares"
 	"api-go/internal/utils"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -24,7 +23,7 @@ func (ah *AuthHandler) RegisterAuthRoutes(r chi.Router) {
 		r.Post("/register", ah.RegisterHandler)
 
 		r.Group(func(r chi.Router) {
-			r.Use(middlewares.AuthMiddleware) // Middleware de autenticação
+			r.Use(middlewares.AuthMiddleware)
 			r.Get("/profile", ah.GetProfileHandler)
 		})
 	})
@@ -52,14 +51,7 @@ func (ah *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate loginRequest and authenticate user
-	// If successful, generate JWT token and respond with it
-
-	// First, we need to get the user from the database
 	user, _ := ah.UserRepository.GetByEmail(loginRequest.Email)
-
-	fmt.Println("User found:", user)
-	fmt.Println("Password provided:", loginRequest.Password)
 
 	if !utils.CheckPasswordHash(loginRequest.Password, user.Password) {
 		utils.RespondWithError(w, http.StatusUnauthorized, "Unauthorized")
@@ -104,7 +96,6 @@ func (ah *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 //	@Failure		500		{object}	dtos.ErrorResponse
 //	@Router			/auth/register [post]
 func (ah *AuthHandler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	// Handle user registration
 	var registerRequest dtos.AuthRegisterRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&registerRequest); err != nil {
@@ -114,14 +105,13 @@ func (ah *AuthHandler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	//print registerRequest
 
-	// Check if the user already exists
 	existingUser, _ := ah.UserRepository.GetByEmail(registerRequest.Email)
 
 	if existingUser != nil {
 		utils.RespondWithError(w, http.StatusConflict, "User already exists")
 		return
 	}
-	// Validate registerRequest and create user
+	// Validate registerRequest
 
 	hashedPassword, err := utils.HashPassword(registerRequest.Password)
 	if err != nil {
