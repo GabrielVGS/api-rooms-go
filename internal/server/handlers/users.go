@@ -3,6 +3,7 @@ package handlers
 import (
 	"api-go/internal/repository"
 	"api-go/internal/server/dtos"
+	"api-go/internal/server/middlewares"
 	"api-go/internal/utils"
 	"encoding/json"
 	"errors"
@@ -229,6 +230,22 @@ func (uh *UserHandler) GetAllUsersHandler(w http.ResponseWriter, r *http.Request
 func (uh *UserHandler) UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	var req dtos.UpdateUserRequest
 
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "Usuário não autorizado")
+		return
+	}
+
+	requestedUserID, err := strconv.ParseUint(chi.URLParam(r, "user_id"), 10, 32)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid user_id")
+		return
+	}
+	if claims.UserID != uint(requestedUserID) {
+		utils.RespondWithError(w, http.StatusForbidden, "Você não tem permissão para atualizar este usuário")
+		return
+	}
+
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, "Falha ao decodificar o corpo da requisição")
 		return
@@ -326,11 +343,27 @@ func (uh *UserHandler) UpdateUserHandler(w http.ResponseWriter, r *http.Request)
 //	@Router			/users/{user_id} [delete]
 func (uh *UserHandler) DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "user_id")
+
 	if userID == "" {
 		utils.RespondWithError(w, http.StatusBadRequest, "Parâmetro 'user_id' é obrigatório")
 		return
 	}
 
+	claims, ok := middlewares.GetUserFromContext(r.Context())
+	if !ok {
+		utils.RespondWithError(w, http.StatusUnauthorized, "Usuário não autorizado")
+		return
+	}
+
+	requestedUserID, err := strconv.ParseUint(userID, 10, 32)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid user_id")
+		return
+	}
+	if claims.UserID != uint(requestedUserID) {
+		utils.RespondWithError(w, http.StatusForbidden, "Você não tem permissão para atualizar este usuário")
+		return
+	}
 	id, err := strconv.Atoi(userID)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, "Parâmetro 'user_id' deve ser um número")

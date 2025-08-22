@@ -108,6 +108,7 @@ func (r *RoomsRepository) GetUserRooms(userID uint) ([]models.Room, error) {
 	var rooms []models.Room
 	err := r.DB.Joins("JOIN room_members ON rooms.id = room_members.room_id").
 		Where("room_members.user_id = ?", userID).
+		Distinct().
 		Find(&rooms).Error
 	return rooms, err
 }
